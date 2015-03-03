@@ -33,6 +33,8 @@ extern FILE* yyin;
 
 /* %token<atom> ATOM */
 %token OPENPAREN CLOSEPAREN
+%token SEPARATOR ASSIGNMENT NEWLINE
+%token IDENTIFIER NUMBER
 /* %type <sexp> sexp list list_contents */
 /* program nonterminal allows us to handle empty input and
  * process the parse finish
@@ -40,8 +42,13 @@ extern FILE* yyin;
 %start program
 
 %%
-program       :
-            {}
+program       : {}
+        |       assignments { printf("parsed\n"); }
+
+assignments   : assignment { printf("single assigment\n"); }
+        |       assignments SEPARATOR assignment { printf("new assignment\n"); }
+
+assignment    : IDENTIFIER ASSIGNMENT NUMBER SEPARATOR
 /*      | sexp {g_parsed = $1;}; */
 /* sexp          : */
 /*        ATOM   {$$ = sexp_item_create_atom($1);} */
@@ -57,7 +64,7 @@ program       :
 
 void yyerror (char const *s)
 {
-  fprintf (stderr, "libsexp parse error: %s\n", s);
+  fprintf (stderr, "libkv parse error: %s\n", s);
 }
 
 

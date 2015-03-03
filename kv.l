@@ -10,6 +10,7 @@
 
    //#include "atomtoken.h"
    #include "libkv.tab.h"
+    int f(int token);
 }
 
 /* we don't need yywrap since we assume what we will
@@ -60,6 +61,7 @@ comment "%".*
       //return ATOM;
       int value = strtol(yytext, 0, 10);
       printf("Integer: %d\n", value);
+      return f(NUMBER);
     }
     
 {floating-point-number} {
@@ -67,6 +69,7 @@ comment "%".*
       /* return ATOM; */
       double value = strtod(yytext, 0);
       printf("Double: %f\n", value);
+      return f(NUMBER);
     }
     
 {string}                {
@@ -77,6 +80,7 @@ comment "%".*
       str[yyleng-1] = '\0';
       printf("String: %s\n", str);
       free(str);
+      return f(NUMBER);
     }
 
 {identifier}                {
@@ -87,31 +91,32 @@ comment "%".*
       str[yyleng] = '\0';
       printf("Identifier: %s\n", str);
       free(str);
+      return f(IDENTIFIER);
     }
     
 {open-paren}            {
       printf("Open paren\n");
-      /* return OPENPAREN; */
+      return f(OPENPAREN);
     }
 
 {close-paren}           {
       printf("Close paren\n");
-      /* return CLOSEPAREN; */
+      return f(CLOSEPAREN);
     }
 
 {assign}           {
       printf("Assign\n");
-      /* return CLOSEPAREN; */
+      return f(ASSIGNMENT);
     }
 
 {divider}           {
       /* printf("Divider\n"); */
-      /* return CLOSEPAREN; */
+      /* return SEPARATOR; */
     }
 
 {separator}           {
       printf("Separator\n");
-      /* return CLOSEPAREN; */
+      return f(SEPARATOR);
     }
 
 
@@ -120,8 +125,24 @@ comment "%".*
       /* return CLOSEPAREN; */
     }
                 
+\n+                {
+      printf("Newline\n");
+      return f(NEWLINE);
+    }
 
-[ \t\n]+          /* eat up whitespace */
+[ \t]+          /* eat up whitespace */
 
 %%
 
+int insert = 0;
+
+int f(int token) {
+  if (insert && token == NEWLINE) {
+    unput('\n');
+    insert = 0;
+    return SEPARATOR;
+  } else {
+    insert = token != SEPARATOR;
+    return token;
+  }
+}

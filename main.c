@@ -31,6 +31,6 @@ int main(int argc, const char* argv[])
   /* else */
   /*   yyin = stdin; */
      
-  yylex();
+  yyparse();
   return 0;
 }
