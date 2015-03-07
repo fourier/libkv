@@ -27,14 +27,23 @@ extern FILE* yyin;
 /* allow debug mode */
 %debug
 /* code to be placed to the header file */
- /*%code requires {#include "libsexp.h"}*/
-
+%code requires {#include "libkv.h"}
+                        
 /* all possible data in lexing/parsing process */
-
+%union {
+    const char* identifier;
+    const char* string;
+    double dbl_value;
+    int int_value;
+}
+                            
 /* %token<atom> ATOM */
 %token OPENPAREN CLOSEPAREN
 %token COMMA SEMICOLON ASSIGNMENT
-%token IDENTIFIER NUMBER STRING
+%token  <identifier> IDENTIFIER
+%token  <string> STRING
+%token  <int_value> INTEGER
+%token  <dbl_value> DOUBLE
 /* %type <sexp> sexp list list_contents */
 /* program nonterminal allows us to handle empty input and
  * process the parse finish
@@ -47,6 +56,8 @@ program          : {}
 
 assignments      : assignment { printf("first assigment\n"); }
         |       assignments SEMICOLON assignment { printf("one more assignment\n"); }
+
+number           : INTEGER | DOUBLE
 
 matrix           : OPENPAREN matrix_contents CLOSEPAREN
 
@@ -63,10 +74,10 @@ separated_list   : matrix_row
 matrix_row       : numbers_list
         |       numbers_list COMMA
 
-numbers_list     : NUMBER
-        |       numbers_list COMMA NUMBER
+numbers_list     : number
+        |       numbers_list COMMA number
 
-assignment    : IDENTIFIER ASSIGNMENT NUMBER
+assignment    : IDENTIFIER ASSIGNMENT number
         |       IDENTIFIER ASSIGNMENT matrix
         |       IDENTIFIER ASSIGNMENT STRING
 

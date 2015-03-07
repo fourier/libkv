@@ -64,7 +64,7 @@ comment               [#%].*\n
       //return ATOM;
       int value = strtol(yytext, 0, 10);
       if (g_verbose) printf("Integer: %d\n", value);
-      return NUMBER;
+      return INTEGER;
     }
     
 {floating-point-number} {
@@ -72,7 +72,7 @@ comment               [#%].*\n
       /* return ATOM; */
       double value = strtod(yytext, 0);
       if (g_verbose) printf("Double: %f\n", value);
-      return NUMBER;
+      return DOUBLE;
     }
     
 {string}                {
