@@ -10,14 +10,17 @@
 
    //#include "atomtoken.h"
    #include "libkv.tab.h"
-    int f(int token);
+   const char* g_filename = 0;
+   void yyerror (char const *s);
+   static int g_verbose = 0;
 }
 
 /* we don't need yywrap since we assume what we will
  * parse one file at a time
  */
 %option noyywrap
-
+%option yylineno
+                        
 /* numbers */
 sign                  "+"|"-"
 decimal-point         "."
@@ -34,25 +37,25 @@ string-char          [[:graph:]]{-}["]
 string               {double-quote}({string-char}|[[:space:]]|{escaped-double-quote})*{double-quote}
 
 /* identifiers */
-letter              [[:alpha:]]|"_"
-identifier-symbol   {letter}|[[:digit:]]
-identifier          {letter}{identifier-symbol}*
+letter               [[:alpha:]]|"_"
+identifier-symbol    {letter}|[[:digit:]]
+identifier           {letter}{identifier-symbol}*
 
 /* parens */                                    
-open-paren           "["
-close-paren          "]"
+open-paren            "["
+close-paren           "]"
 
 /* assignments */
-assign               "="                                                
+assign                "="                                                
 
-/* dividers */
-divider              [[:space:]]*","[[:space:]]*                        
+/* commas */
+comma                 [[:space:]]*","[[:space:]]*                        
 
-/* separator */
-separator              [[:space:]]*";"[[:space:]]*
+/* semicolons */
+semicolon             [[:space:]]*";"[[:space:]]*
                                                 
 /* comments */
-comment "%".*
+comment               [#%].*\n
                         
 %%
 
@@ -60,16 +63,16 @@ comment "%".*
       //yylval.atom = atom_token_integer_alloc(yytext,yytext+yyleng);
       //return ATOM;
       int value = strtol(yytext, 0, 10);
-      printf("Integer: %d\n", value);
-      return f(NUMBER);
+      if (g_verbose) printf("Integer: %d\n", value);
+      return NUMBER;
     }
     
 {floating-point-number} {
       /* yylval.atom = atom_token_float_alloc(yytext,yytext+yyleng); */
       /* return ATOM; */
       double value = strtod(yytext, 0);
-      printf("Double: %f\n", value);
-      return f(NUMBER);
+      if (g_verbose) printf("Double: %f\n", value);
+      return NUMBER;
     }
     
 {string}                {
@@ -78,9 +81,9 @@ comment "%".*
       char* str = malloc(yyleng-1);
       memcpy(str, yytext+1, yyleng-2);
       str[yyleng-1] = '\0';
-      printf("String: %s\n", str);
+      if (g_verbose) printf("String: %s\n", str);
       free(str);
-      return f(NUMBER);
+      return STRING;
     }
 
 {identifier}                {
@@ -89,60 +92,56 @@ comment "%".*
       char* str = malloc(yyleng+1);
       memcpy(str, yytext, yyleng);
       str[yyleng] = '\0';
-      printf("Identifier: %s\n", str);
+      if (g_verbose) printf("Identifier: %s\n", str);
       free(str);
-      return f(IDENTIFIER);
+      return IDENTIFIER;
     }
     
 {open-paren}            {
-      printf("Open paren\n");
-      return f(OPENPAREN);
+      if (g_verbose) printf("Open paren\n");
+      return OPENPAREN;
     }
 
 {close-paren}           {
-      printf("Close paren\n");
-      return f(CLOSEPAREN);
+      if (g_verbose) printf("Close paren\n");
+      return CLOSEPAREN;
     }
 
 {assign}           {
-      printf("Assign\n");
-      return f(ASSIGNMENT);
+      if (g_verbose) printf("Assign\n");
+      return ASSIGNMENT;
     }
 
-{divider}           {
-      /* printf("Divider\n"); */
-      /* return SEPARATOR; */
+{comma}           {
+      if (g_verbose) printf("Comma\n");
+      return COMMA;
     }
 
-{separator}           {
-      printf("Separator\n");
-      return f(SEPARATOR);
+{semicolon}           {
+      if (g_verbose) printf("Semicolon\n");
+      return SEMICOLON;
     }
-
 
 {comment}           {
-      printf("Comment\n");
+      if (g_verbose) printf("Comment\n");
       /* return CLOSEPAREN; */
     }
                 
-\n+                {
-      printf("Newline\n");
-      return f(NEWLINE);
-    }
+[\n \t]+          /* eat up whitespace */
 
-[ \t]+          /* eat up whitespace */
+.                   {
+      char message[25];
+      sprintf(message, "Unknown character %c\n", yytext[0]);
+      yyerror(message);
+    }
 
 %%
 
-int insert = 0;
-
-int f(int token) {
-  if (insert && token == NEWLINE) {
-    unput('\n');
-    insert = 0;
-    return SEPARATOR;
-  } else {
-    insert = token != SEPARATOR;
-    return token;
-  }
+void yyerror (char const *s)
+{
+  if (g_filename) 
+    fprintf(stderr, "%s:%d: %s at %s\n", g_filename, yylineno, s, yytext);
+  else
+    fprintf(stderr, "%d: %s at %s\n", yylineno, s, yytext);
 }
+

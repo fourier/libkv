@@ -33,8 +33,8 @@ extern FILE* yyin;
 
 /* %token<atom> ATOM */
 %token OPENPAREN CLOSEPAREN
-%token SEPARATOR ASSIGNMENT NEWLINE
-%token IDENTIFIER NUMBER
+%token COMMA SEMICOLON ASSIGNMENT
+%token IDENTIFIER NUMBER STRING
 /* %type <sexp> sexp list list_contents */
 /* program nonterminal allows us to handle empty input and
  * process the parse finish
@@ -42,30 +42,36 @@ extern FILE* yyin;
 %start program
 
 %%
-program       : {}
-        |       assignments { printf("parsed\n"); }
+program          : {}
+        |       assignments SEMICOLON { printf("parsed\n"); }
 
-assignments   : assignment { printf("single assigment\n"); }
-        |       assignments SEPARATOR assignment { printf("new assignment\n"); }
+assignments      : assignment { printf("first assigment\n"); }
+        |       assignments SEMICOLON assignment { printf("one more assignment\n"); }
 
-assignment    : IDENTIFIER ASSIGNMENT NUMBER SEPARATOR
-/*      | sexp {g_parsed = $1;}; */
-/* sexp          : */
-/*        ATOM   {$$ = sexp_item_create_atom($1);} */
-/*      | list   {$$ = $1;}; */
-/* list          : */
-/*        OPENPAREN CLOSEPAREN {$$ = sexp_item_create_atom(atom_token_nil_alloc()); } */
-/*      | OPENPAREN list_contents CLOSEPAREN { $$ = $2; }; */
-/* list_contents : */
-/*        sexp { $$ = sexp_item_create_cons($1,sexp_item_create_atom(atom_token_nil_alloc()));} */
-/*      | sexp list_contents { $$ = sexp_item_create_cons($1,$2); } */
+matrix           : OPENPAREN matrix_contents CLOSEPAREN
+
+/* contents is a separated list with optional semicolon */
+matrix_contents  : separated_list  { printf("matrix\n"); }
+        |       separated_list SEMICOLON { printf("matrix\n"); }
+
+separated_list   : matrix_row
+        |       separated_list SEMICOLON matrix_row
+
+/* matrix row is a list of numbers separated by comma,
+ * with the optional comma at the end
+ */
+matrix_row       : numbers_list
+        |       numbers_list COMMA
+
+numbers_list     : NUMBER
+        |       numbers_list COMMA NUMBER
+
+assignment    : IDENTIFIER ASSIGNMENT NUMBER
+        |       IDENTIFIER ASSIGNMENT matrix
+        |       IDENTIFIER ASSIGNMENT STRING
 
 %%
 
-void yyerror (char const *s)
-{
-  fprintf (stderr, "libkv parse error: %s\n", s);
-}
 
 
 /* sexp_item* sexp_parse_file(FILE* input) */
