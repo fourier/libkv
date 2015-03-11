@@ -1,7 +1,9 @@
 /* -*- Mode: C; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
-#include "libkv.h"
+#include "kv_table.h"
+
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 /* simple hash table of fixed size */
 #define HASH_ELTS 9997
@@ -10,7 +12,7 @@
 struct kv_bucket
 { 
   const char* name;
-  kv_value_t value;
+  struct kv_value_t value;
   struct kv_bucket* next;
 };
 
@@ -32,13 +34,13 @@ static long hash_function(int size,const char* str)
   return h % size;
 }
 
-const kv_value_t* kv_get(const char* name)
+const struct kv_value_t* kv_table_get(const char* name)
 {
   struct kv_bucket* bucket = hash_table[hash_function(HASH_ELTS, name)];
   return bucket ? &bucket->value : 0;
 }
 
-void kv_put(const char* name, kv_value_t* value)
+void kv_table_put(const char* name, struct kv_value_t* value)
 {
   long hash_index = hash_function(HASH_ELTS, name);
   struct kv_bucket* bucket = hash_table[hash_index];
@@ -60,6 +62,10 @@ void kv_put(const char* name, kv_value_t* value)
       bucket->value = *value;
       last->next = bucket;
     }
+    else                        /* found with the same name, replace */
+    {
+      bucket->value = *value;
+    }
   }
   else                          /* new element */
   {
@@ -73,3 +79,26 @@ void kv_put(const char* name, kv_value_t* value)
   
 }
 
+
+static void kv_table_dump_bucket(struct kv_bucket* bucket)
+{
+  printf("Identifier: %s\n", bucket->name);
+  kv_value_print(&bucket->value);
+}
+
+void kv_table_dump()
+{
+  int i = 0;
+  for (; i < HASH_ELTS; ++ i)
+  {
+    struct kv_bucket* bucket;
+    if ((bucket = hash_table[i]))
+    {
+      while (bucket)
+      {
+        kv_table_dump_bucket(bucket);
+        bucket = bucket->next;
+      }
+    }
+  }
+}

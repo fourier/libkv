@@ -64,6 +64,7 @@ comment               [#%].*\n
       //return ATOM;
       int value = strtol(yytext, 0, 10);
       if (g_verbose) printf("Integer: %d\n", value);
+      yylval.int_value = value;
       return INTEGER;
     }
     
@@ -72,6 +73,7 @@ comment               [#%].*\n
       /* return ATOM; */
       double value = strtod(yytext, 0);
       if (g_verbose) printf("Double: %f\n", value);
+      yylval.dbl_value = value;
       return DOUBLE;
     }
     
@@ -82,7 +84,7 @@ comment               [#%].*\n
       memcpy(str, yytext+1, yyleng-2);
       str[yyleng-1] = '\0';
       if (g_verbose) printf("String: %s\n", str);
-      free(str);
+      yylval.string = str;
       return STRING;
     }
 
@@ -93,7 +95,7 @@ comment               [#%].*\n
       memcpy(str, yytext, yyleng);
       str[yyleng] = '\0';
       if (g_verbose) printf("Identifier: %s\n", str);
-      free(str);
+      yylval.identifier = str;
       return IDENTIFIER;
     }
     

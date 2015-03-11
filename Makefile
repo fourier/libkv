@@ -29,7 +29,7 @@ OUTPUT_SRC = main.c
 SOURCES := $(wildcard *.c)
 HEADERS := $(wildcard *.h)
 LEXES   := $(wildcard *.lex)
-OBJECTS := $(patsubst %.c,%.o,$(SOURCES)) libkv.yy.o libkv.tab.o
+OBJECTS := libkv.yy.o libkv.tab.o $(patsubst %.c,%.o,$(SOURCES)) 
 OBJECTS_LIB := $(filter-out $(patsubst %.c,%.o,$(OUTPUT_SRC)),$(OBJECTS))
 OUTPUT = kvtest
 OUTPUT_LIB = libkv.a
@@ -41,16 +41,18 @@ all: $(OUTPUT)
 %.o : %.c %.h
 	$(CC) -c $(CFLAGS) $(DEFINES) $(INCLUDES) $< -o $@
 
-libkv.tab.o: libkv.tab.c
+libkv.tab.o: libkv.tab.c libkv.tab.h
 	$(CC) -c -ggdb -pg -o $@ $<
 
-libkv.tab.c: kv.y
+libkv.tab.h: grammar.y libkv.tab.c
+
+libkv.tab.c: grammar.y
 	$(YACC) -y --defines=libkv.tab.h -o libkv.tab.c -o $@ $<
 
 libkv.yy.o: libkv.yy.c libkv.tab.c
 	$(CC) -c -ggdb -pg -o $@ $<
 
-libkv.yy.c: kv.l
+libkv.yy.c: grammar.l
 	$(LEX) -f -o $@ $<
 
 
@@ -66,8 +68,7 @@ lint:
 	splint *.c
 
 clean :
-	rm $(OBJECTS) $(OUTPUT) $(OUTPUT_LIB)
-#libkv.yy.c libkv.tab.*
+	rm $(OBJECTS) $(OUTPUT) $(OUTPUT_LIB) libkv.tab.c libkv.tab.h libkv.yy.c
 
 check-syntax: 
 	gcc -o nul -S ${CHK_SOURCES} 

@@ -44,7 +44,7 @@ extern FILE* yyin;
 %token  <string> STRING
 %token  <int_value> INTEGER
 %token  <dbl_value> DOUBLE
-/* %type <sexp> sexp list list_contents */
+
 /* program nonterminal allows us to handle empty input and
  * process the parse finish
  */
@@ -52,12 +52,13 @@ extern FILE* yyin;
 
 %%
 program          : {}
-        |       assignments SEMICOLON { printf("parsed\n"); }
+        |       assignments SEMICOLON { kv_table_dump(); }
 
 assignments      : assignment { printf("first assigment\n"); }
         |       assignments SEMICOLON assignment { printf("one more assignment\n"); }
 
-number           : INTEGER | DOUBLE
+number           : INTEGER
+        |       DOUBLE
 
 matrix           : OPENPAREN matrix_contents CLOSEPAREN
 
@@ -77,9 +78,10 @@ matrix_row       : numbers_list
 numbers_list     : number
         |       numbers_list COMMA number
 
-assignment    : IDENTIFIER ASSIGNMENT number
+assignment    : IDENTIFIER ASSIGNMENT INTEGER { struct kv_value_t val; kv_init_int(&val, $3); kv_table_put($1, &val); }
+        |       IDENTIFIER ASSIGNMENT DOUBLE { struct kv_value_t val; kv_init_double(&val, $3); kv_table_put($1, &val); }
         |       IDENTIFIER ASSIGNMENT matrix
-        |       IDENTIFIER ASSIGNMENT STRING
+        |       IDENTIFIER ASSIGNMENT STRING { struct kv_value_t val; kv_init_string(&val, $3); kv_table_put($1, &val); }
 
 %%
 
