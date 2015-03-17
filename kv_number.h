@@ -2,7 +2,7 @@
 #ifndef KV_NUMBER_H
 #define KV_NUMBER_H
 
-typedef struct
+struct kv_number_t
 {
   int is_int;
   union 
@@ -10,7 +10,8 @@ typedef struct
     int i_val;
     double f_val;
   } val;
-} kv_number_t;
+};
+typedef struct kv_number_t kv_number_t;
 
 #define KV_NUMBER_SET_INT(n, i) { (n).is_int = 1; (n).val.i_val = (i); }
 #define KV_NUMBER_SET_DBL(n, f) { (n).is_int = 0; (n).val.f_val = (f); }

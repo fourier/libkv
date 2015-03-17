@@ -1,6 +1,9 @@
 /* -*- Mode: C; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* local includes */
 #include "kv_vector.h"
+#include "kv_number.h"
 
+/* system includes */
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>

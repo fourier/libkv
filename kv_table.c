@@ -1,6 +1,8 @@
 /* -*- Mode: C; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* local includes */
 #include "kv_table.h"
 
+/* system includes */
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

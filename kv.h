@@ -20,29 +20,30 @@ struct kv_value_t {
     void* pointer;
   } data;
 };
+typedef struct kv_value_t kv_value_t;
 
 /**
  * initializers
  */
-void kv_init_int(struct kv_value_t* kv, int value);
-void kv_init_double(struct kv_value_t* kv, double value);
-void kv_init_string(struct kv_value_t* kv, const char* value);
-void kv_init_vector(struct kv_value_t* kv, const kv_vector_t* value);
+void kv_init_int(kv_value_t* kv, int value);
+void kv_init_double(kv_value_t* kv, double value);
+void kv_init_string(kv_value_t* kv, const char* value);
+void kv_init_vector(kv_value_t* kv, const kv_vector_t* value);
 
 /**
  * getters
  */
-value_type kv_type(const struct kv_value_t* kv);
+value_type kv_type(const kv_value_t* kv);
 
   
-int kv_int(const struct kv_value_t* kv);
-double kv_double(const struct kv_value_t* kv);
-const char* kv_string(const struct kv_value_t* kv);
+int kv_int(const kv_value_t* kv);
+double kv_double(const kv_value_t* kv);
+const char* kv_string(const kv_value_t* kv);
 
 /**
  * Auxulary methods
  */
-void kv_value_print(const struct kv_value_t* kv);
+void kv_value_print(const kv_value_t* kv);
   
 
 #endif /* KV_H */

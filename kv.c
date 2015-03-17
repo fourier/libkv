@@ -1,54 +1,56 @@
 /* -*- Mode: C; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* local includes */
 #include "kv.h"
 
+/* system includes */
 #include <stdio.h>
 
-void kv_init_int(struct kv_value_t* kv, int value)
+void kv_init_int( kv_value_t* kv, int value)
 {
   kv->type = VALUE_INTEGER;
   kv->data.int_value = value;
 }
 
-void kv_init_double(struct kv_value_t* kv, double value)
+void kv_init_double( kv_value_t* kv, double value)
 {
   kv->type = VALUE_DOUBLE;
   kv->data.dbl_value = value;
 }
 
-void kv_init_string(struct kv_value_t* kv, const char* string)
+void kv_init_string( kv_value_t* kv, const char* string)
 {
   kv->type = VALUE_STRING;
   kv->data.pointer = (void*)string;
 }
 
-void kv_init_vector(struct kv_value_t* kv, const kv_vector_t* value)
+void kv_init_vector( kv_value_t* kv, const kv_vector_t* value)
 {
   kv->type = VALUE_VECTOR;
   kv->data.pointer = (void*)value;
 }
 
-value_type kv_type(const struct kv_value_t* kv)
+value_type kv_type(const  kv_value_t* kv)
 {
   return kv->type;
 }
 
-int kv_int(const struct kv_value_t* kv)
+int kv_int(const  kv_value_t* kv)
 {
   return kv->data.int_value;
 }
 
-double kv_double(const struct kv_value_t* kv)
+double kv_double(const  kv_value_t* kv)
 {
   return kv->data.dbl_value;
 }
 
-const char* kv_string(const struct kv_value_t* kv)
+const char* kv_string(const  kv_value_t* kv)
 {
   return (const char*)kv->data.pointer;
 }
 
 
-void kv_value_print(const struct kv_value_t* kv)
+void kv_value_print(const  kv_value_t* kv)
 {
   switch (kv->type)
   {

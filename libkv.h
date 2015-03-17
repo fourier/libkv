@@ -6,5 +6,6 @@
 #include "kv_table.h"
 #include "kv_number.h"
 #include "kv_vector.h"
+#include "kv_matrix.h"
 
 #endif /* LIBKV_H */
