@@ -1,3 +1,0 @@
-a = "myass";
-c = 1
-b = wtf?

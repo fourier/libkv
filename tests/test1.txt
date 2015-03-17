@@ -1,5 +1,5 @@
 hello = "world";
-% what a fuck?
+% what a hell?
 var = 3.14; % not sure about the real value
 var2 = 4;
 mtx = [1];
