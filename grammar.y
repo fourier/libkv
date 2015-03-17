@@ -35,11 +35,7 @@ extern FILE* yyin;
     const char* string;
     double dbl_value;
     int int_value;
-    struct {
-        int is_int;
-        int int_val;
-        double dbl_val;
-    } number;
+    kv_number num;
 }
                             
 %token OPENPAREN CLOSEPAREN
@@ -48,7 +44,7 @@ extern FILE* yyin;
 %token  <string> STRING
 %token  <int_value> INTEGER
 %token  <dbl_value> DOUBLE
-%type   <number>        number
+%type   <num>        number
                         
 /* program nonterminal allows us to handle empty input and
  * process the parse finish
@@ -59,11 +55,42 @@ extern FILE* yyin;
 program          : {}
         |       assignments SEMICOLON { kv_table_dump(); }
 
+/* assignments are semicolon-separated */
 assignments      : assignment { printf("first assigment\n"); }
         |       assignments SEMICOLON assignment { printf("one more assignment\n"); }
 
-number           : INTEGER { $<number>$.is_int = 1; $<number>$.int_val = $1; }
-        |       DOUBLE { $<number>$.is_int = 0; $<number>$.dbl_val = $1; }
+/* number is a nonterminal for heterogeneous vector/matrix */
+number           : INTEGER { KV_NUMBER_SET_INT($<num>$, $1); }
+        |       DOUBLE { KV_NUMBER_SET_DBL($<num>$, $1); }
+
+/* vector is either single value in [], like [1], or list of semicolon-separated
+ * values
+ */
+vector           : OPENPAREN vector_contents CLOSEPAREN { printf("\nvector done\n"); }
+
+vector_contents  :
+/* handle single values */
+        |       number {
+            printf("single: "); KV_NUMBER_PRINT($1); 
+ }
+
+        |       number COMMA {
+            printf("single: "); KV_NUMBER_PRINT($1); 
+}
+        |       number SEMICOLON  {
+            printf("single: "); KV_NUMBER_PRINT($1); 
+}
+        |       number COMMA SEMICOLON  {
+            printf("single: "); KV_NUMBER_PRINT($1); 
+}
+/* handle list of values */
+        |       vector_column
+        |       vector_column SEMICOLON
+
+/* list of values is at least 2 elements */
+vector_column     : number SEMICOLON number { KV_NUMBER_PRINT($1); printf(", "); KV_NUMBER_PRINT($3)}
+        |       vector_column SEMICOLON number { printf(", "); KV_NUMBER_PRINT($3); }
+
 
 matrix           : OPENPAREN matrix_contents CLOSEPAREN
 
@@ -71,8 +98,8 @@ matrix           : OPENPAREN matrix_contents CLOSEPAREN
 matrix_contents  : separated_list  { printf("matrix done\n"); }
         |       separated_list SEMICOLON { printf("matrix done\n"); }
 
-separated_list   : matrix_row { printf("first row done\n"); }
-        |       separated_list SEMICOLON matrix_row { printf("next row done\n"); }
+separated_list   : matrix_row { printf("\nfirst row done\n"); }
+        |       separated_list SEMICOLON matrix_row { printf("\nnext row done\n"); }
 
 /* matrix row is a list of numbers separated by comma,
  * with the optional comma at the end
@@ -80,12 +107,17 @@ separated_list   : matrix_row { printf("first row done\n"); }
 matrix_row       : numbers_list
         |       numbers_list COMMA
 
-numbers_list     : number { printf($1.is_int ? "first %d " : "first %f ", $1.is_int ? $1.int_val : $1.dbl_val); }
-        |       numbers_list COMMA number { printf($3.is_int ? "rest %d " : "rest %f ", $3.is_int ? $3.int_val : $3.dbl_val); }
+/* list of numbers shall contain at least 2 comma-separated numbers */
+numbers_list     : number COMMA number { KV_NUMBER_PRINT($1); printf(", "); KV_NUMBER_PRINT($3);}
+        |       numbers_list COMMA number { printf(", "); KV_NUMBER_PRINT($3); }
 
+
+
+/* all possible assignments */
 assignment    : IDENTIFIER ASSIGNMENT INTEGER { struct kv_value_t val; kv_init_int(&val, $3); kv_table_put($1, &val); }
         |       IDENTIFIER ASSIGNMENT DOUBLE { struct kv_value_t val; kv_init_double(&val, $3); kv_table_put($1, &val); }
         |       IDENTIFIER ASSIGNMENT matrix
+        |       IDENTIFIER ASSIGNMENT vector
         |       IDENTIFIER ASSIGNMENT STRING { struct kv_value_t val; kv_init_string(&val, $3); kv_table_put($1, &val); }
 
 %%
