@@ -21,7 +21,7 @@ void kv_init_string(struct kv_value_t* kv, const char* string)
   kv->data.pointer = (void*)string;
 }
 
-void kv_init_vector(struct kv_value_t* kv, const kv_vector* value)
+void kv_init_vector(struct kv_value_t* kv, const kv_vector_t* value)
 {
   kv->type = VALUE_VECTOR;
   kv->data.pointer = (void*)value;
@@ -63,7 +63,7 @@ void kv_value_print(const struct kv_value_t* kv)
     break;
   case VALUE_VECTOR:
     printf("vector: ");
-    kv_vector_print((const kv_vector*)kv->data.pointer);
+    kv_vector_print((const kv_vector_t*)kv->data.pointer);
     printf("\n");    
     break;
   case VALUE_MATRIX:

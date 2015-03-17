@@ -37,8 +37,8 @@ extern FILE* yyin;
     const char* string;
     double dbl_value;
     int int_value;
-    kv_number num;
-    kv_vector* vector;
+    kv_number_t num;
+    kv_vector_t* vector;
 }
                             
 %token OPENPAREN CLOSEPAREN

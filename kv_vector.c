@@ -6,13 +6,13 @@
 #include <assert.h>
 #include <stdio.h>
 
-void kv_vector_init(kv_vector* vec)
+static void kv_vector_init(kv_vector_t* vec)
 {
   assert(vec);
   memset(vec, 0, sizeof(*vec));
 }
 
-void kv_vector_init_one_elt(kv_vector* vec, const kv_number* number)
+static void kv_vector_init_one_elt(kv_vector_t* vec, const kv_number_t* number)
 {
   assert(vec);
   kv_vector_init(vec);
@@ -27,9 +27,9 @@ void kv_vector_init_one_elt(kv_vector* vec, const kv_number* number)
     *(double*)vec->data = number->val.f_val;    
 }
 
-void kv_vector_init_two_elts(kv_vector* vec,
-                             const kv_number* number1,
-                             const kv_number* number2)
+static void kv_vector_init_two_elts(kv_vector_t* vec,
+                                    const kv_number_t* number1,
+                                    const kv_number_t* number2)
 {
   assert(vec);
   kv_vector_init(vec);
@@ -57,18 +57,18 @@ void kv_vector_init_two_elts(kv_vector* vec,
   
 }
 
-kv_vector* kv_vector_alloc_one_elt(const kv_number* number)
+kv_vector_t* kv_vector_alloc_one_elt(const kv_number_t* number)
 {
-  kv_vector* vec = malloc(sizeof(kv_vector));
+  kv_vector_t* vec = malloc(sizeof(kv_vector_t));
   assert(vec);
   kv_vector_init_one_elt(vec, number);
   return vec;
 }
 
-kv_vector* kv_vector_alloc_two_elts(const kv_number* number1,
-                                    const kv_number* number2)
+kv_vector_t* kv_vector_alloc_two_elts(const kv_number_t* number1,
+                                    const kv_number_t* number2)
 {
-  kv_vector* vec = malloc(sizeof(kv_vector));
+  kv_vector_t* vec = malloc(sizeof(kv_vector_t));
   assert(vec);
   kv_vector_init_two_elts(vec, number1, number2);
   return vec;
@@ -76,7 +76,7 @@ kv_vector* kv_vector_alloc_two_elts(const kv_number* number1,
 
 
 
-void kv_vector_fini(kv_vector* vec)
+void kv_vector_fini(kv_vector_t* vec)
 {
   assert(vec);
   if (vec && vec->size)
@@ -98,7 +98,7 @@ static int kv_vector_new_size(int old_size)
   return size;
 }
 
-static void kv_vector_try_convert_double(kv_vector* vec)
+static void kv_vector_try_convert_double(kv_vector_t* vec)
 {
   assert(vec);
   if (vec->is_int)
@@ -116,7 +116,7 @@ static void kv_vector_try_convert_double(kv_vector* vec)
 }
 
 
-static void kv_vector_grow(kv_vector* vec)
+static void kv_vector_grow(kv_vector_t* vec)
 {
   assert(vec);
   vec->reserved = kv_vector_new_size(vec->reserved);
@@ -125,14 +125,14 @@ static void kv_vector_grow(kv_vector* vec)
   assert(vec->data);
 }
 
-static void kv_vector_grow_double(kv_vector* vec)
+static void kv_vector_grow_double(kv_vector_t* vec)
 {
   assert(vec);
   vec->reserved = kv_vector_new_size(vec->reserved);
   kv_vector_try_convert_double(vec);  
 }
 
-static void kv_vector_simple_push_back(kv_vector* vec, const kv_number* number)
+static void kv_vector_simple_push_back(kv_vector_t* vec, const kv_number_t* number)
 {
   if (vec->is_int)            /* add as integer */
   {
@@ -146,7 +146,7 @@ static void kv_vector_simple_push_back(kv_vector* vec, const kv_number* number)
   }
 }
 
-void kv_vector_push_back(kv_vector* vec, const kv_number* number)
+void kv_vector_push_back(kv_vector_t* vec, const kv_number_t* number)
 {
   assert(vec);
   /* simple case when not yet created array */
@@ -170,7 +170,7 @@ void kv_vector_push_back(kv_vector* vec, const kv_number* number)
   }
 }
 
-void kv_vector_print(const kv_vector* vec)
+void kv_vector_print(const kv_vector_t* vec)
 {
   int i;
   assert(vec);

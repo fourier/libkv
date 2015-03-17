@@ -27,7 +27,7 @@ struct kv_value_t {
 void kv_init_int(struct kv_value_t* kv, int value);
 void kv_init_double(struct kv_value_t* kv, double value);
 void kv_init_string(struct kv_value_t* kv, const char* value);
-void kv_init_vector(struct kv_value_t* kv, const kv_vector* value);
+void kv_init_vector(struct kv_value_t* kv, const kv_vector_t* value);
 
 /**
  * getters
