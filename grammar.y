@@ -27,7 +27,9 @@ extern FILE* yyin;
 /* allow debug mode */
 %debug
 /* code to be placed to the header file */
-%code requires {#include "libkv.h"}
+%code requires {
+#include "libkv.h"
+}
                         
 /* all possible data in lexing/parsing process */
 %union {
@@ -36,6 +38,7 @@ extern FILE* yyin;
     double dbl_value;
     int int_value;
     kv_number num;
+    kv_vector* vector;
 }
                             
 %token OPENPAREN CLOSEPAREN
@@ -45,6 +48,9 @@ extern FILE* yyin;
 %token  <int_value> INTEGER
 %token  <dbl_value> DOUBLE
 %type   <num>        number
+%type   <vector>     vector;
+%type   <vector>     vector_contents;
+%type   <vector>     vector_column;
                         
 /* program nonterminal allows us to handle empty input and
  * process the parse finish
@@ -66,30 +72,34 @@ number           : INTEGER { KV_NUMBER_SET_INT($<num>$, $1); }
 /* vector is either single value in [], like [1], or list of semicolon-separated
  * values
  */
-vector           : OPENPAREN vector_contents CLOSEPAREN { printf("\nvector done\n"); }
+vector           : OPENPAREN vector_contents CLOSEPAREN {
+            $<vector>$ = $2;
+}
 
 vector_contents  :
 /* handle single values */
-        |       number {
-            printf("single: "); KV_NUMBER_PRINT($1); 
+               number {
+            $<vector>$ = kv_vector_alloc_one_elt(&$1);
  }
 
         |       number COMMA {
-            printf("single: "); KV_NUMBER_PRINT($1); 
+            $<vector>$ = kv_vector_alloc_one_elt(&$1);
 }
         |       number SEMICOLON  {
-            printf("single: "); KV_NUMBER_PRINT($1); 
+            $<vector>$ = kv_vector_alloc_one_elt(&$1);
 }
         |       number COMMA SEMICOLON  {
-            printf("single: "); KV_NUMBER_PRINT($1); 
+            $<vector>$ = kv_vector_alloc_one_elt(&$1);
 }
 /* handle list of values */
-        |       vector_column
-        |       vector_column SEMICOLON
+        |       vector_column { $<vector>$ = $1; }
+        |       vector_column SEMICOLON { $<vector>$ = $1; }
 
 /* list of values is at least 2 elements */
-vector_column     : number SEMICOLON number { KV_NUMBER_PRINT($1); printf(", "); KV_NUMBER_PRINT($3)}
-        |       vector_column SEMICOLON number { printf(", "); KV_NUMBER_PRINT($3); }
+vector_column     : number SEMICOLON number {
+            $<vector>$ = kv_vector_alloc_two_elts(&$1, &$3);
+}
+     |       vector_column SEMICOLON number { kv_vector_push_back($<vector>$, &$3); }
 
 
 matrix           : OPENPAREN matrix_contents CLOSEPAREN
@@ -117,7 +127,7 @@ numbers_list     : number COMMA number { KV_NUMBER_PRINT($1); printf(", "); KV_N
 assignment    : IDENTIFIER ASSIGNMENT INTEGER { struct kv_value_t val; kv_init_int(&val, $3); kv_table_put($1, &val); }
         |       IDENTIFIER ASSIGNMENT DOUBLE { struct kv_value_t val; kv_init_double(&val, $3); kv_table_put($1, &val); }
         |       IDENTIFIER ASSIGNMENT matrix
-        |       IDENTIFIER ASSIGNMENT vector
+        |       IDENTIFIER ASSIGNMENT vector { struct kv_value_t val; kv_init_vector(&val, $3); kv_table_put($1, &val); }
         |       IDENTIFIER ASSIGNMENT STRING { struct kv_value_t val; kv_init_string(&val, $3); kv_table_put($1, &val); }
 
 %%

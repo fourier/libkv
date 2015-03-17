@@ -21,6 +21,12 @@ void kv_init_string(struct kv_value_t* kv, const char* string)
   kv->data.pointer = (void*)string;
 }
 
+void kv_init_vector(struct kv_value_t* kv, const kv_vector* value)
+{
+  kv->type = VALUE_VECTOR;
+  kv->data.pointer = (void*)value;
+}
+
 value_type kv_type(const struct kv_value_t* kv)
 {
   return kv->type;
@@ -55,13 +61,12 @@ void kv_value_print(const struct kv_value_t* kv)
   case VALUE_INTEGER:
     printf("int: %d\n", kv->data.int_value);
     break;
-  case VALUE_INT_VECTOR:
+  case VALUE_VECTOR:
+    printf("vector: ");
+    kv_vector_print((const kv_vector*)kv->data.pointer);
+    printf("\n");    
     break;
-  case VALUE_DOUBLE_VECTOR:
-    break;
-  case VALUE_INT_MATRIX:
-    break;
-  case VALUE_DOUBLE_MATRIX:
+  case VALUE_MATRIX:
     break;
   default:
     break;
