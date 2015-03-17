@@ -39,6 +39,7 @@ extern FILE* yyin;
     int int_value;
     kv_number_t num;
     kv_vector_t* vector;
+    kv_matrix_t* matrix;
 }
                             
 %token OPENPAREN CLOSEPAREN
@@ -51,6 +52,11 @@ extern FILE* yyin;
 %type   <vector>     vector;
 %type   <vector>     vector_contents;
 %type   <vector>     vector_column;
+%type   <matrix>     matrix;
+%type   <matrix>     matrix_contents;
+%type   <matrix>     separated_list
+%type   <vector>     matrix_row;
+%type   <vector>     numbers_list
                         
 /* program nonterminal allows us to handle empty input and
  * process the parse finish
@@ -103,23 +109,30 @@ vector_column     : number SEMICOLON number {
 
 
 matrix           : OPENPAREN matrix_contents CLOSEPAREN
+                { $<matrix>$ = $2; }
 
 /* contents is a separated list with optional semicolon */
-matrix_contents  : separated_list  { printf("matrix done\n"); }
-        |       separated_list SEMICOLON { printf("matrix done\n"); }
+matrix_contents  : separated_list  { $<matrix>$ = $1; printf("matrix done\n"); }
+        |       separated_list SEMICOLON { $<matrix>$ = $1; printf("matrix done\n"); }
 
-separated_list   : matrix_row { printf("\nfirst row done\n"); }
-        |       separated_list SEMICOLON matrix_row { printf("\nnext row done\n"); }
+separated_list   : matrix_row {
+            $<matrix>$ = kv_matrix_alloc($1);
+            printf("first row done\n");
+}
+        |       separated_list SEMICOLON matrix_row {
+            kv_matrix_add_row($<matrix>$, $3);
+            printf("next row done\n");
+ }
 
 /* matrix row is a list of numbers separated by comma,
  * with the optional comma at the end
  */
-matrix_row       : numbers_list
-        |       numbers_list COMMA
+matrix_row       : numbers_list { $<vector>$ = $1; }
+        |       numbers_list COMMA { $<vector>$ = $1; }
 
 /* list of numbers shall contain at least 2 comma-separated numbers */
-numbers_list     : number COMMA number { KV_NUMBER_PRINT($1); printf(", "); KV_NUMBER_PRINT($3);}
-        |       numbers_list COMMA number { printf(", "); KV_NUMBER_PRINT($3); }
+numbers_list     : number COMMA number { $<vector>$ = kv_vector_alloc_two_elts(&$1, &$3); }
+        |       numbers_list COMMA number { kv_vector_push_back($<vector>$, &$3); }
 
 
 
