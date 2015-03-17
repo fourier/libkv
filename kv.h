@@ -12,15 +12,14 @@ typedef enum {
   VALUE_MATRIX,
 } value_type;
 
-struct kv_value_t {
+typedef struct kv_value_t {
   value_type type;
   union {
     double dbl_value;
     int int_value;
     void* pointer;
   } data;
-};
-typedef struct kv_value_t kv_value_t;
+} kv_value_t;
 
 /**
  * initializers

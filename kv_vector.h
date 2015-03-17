@@ -4,14 +4,13 @@
 
 struct kv_number_t;
 
-struct kv_vector_t
+typedef struct kv_vector_t
 {
   int size;
   int reserved;
   int is_int;
   void* data;
-};
-typedef struct kv_vector_t kv_vector_t;
+} kv_vector_t;
 
 /**
  * constructors

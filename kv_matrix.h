@@ -2,7 +2,7 @@
 #ifndef KV_MATRIX_H
 #define KV_MATRIX_H
 
-typedef struct
+typedef struct kv_matrix_t
 {
   int rows;
   int cols;
