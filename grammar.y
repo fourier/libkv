@@ -35,16 +35,21 @@ extern FILE* yyin;
     const char* string;
     double dbl_value;
     int int_value;
+    struct {
+        int is_int;
+        int int_val;
+        double dbl_val;
+    } number;
 }
                             
-/* %token<atom> ATOM */
 %token OPENPAREN CLOSEPAREN
 %token COMMA SEMICOLON ASSIGNMENT
 %token  <identifier> IDENTIFIER
 %token  <string> STRING
 %token  <int_value> INTEGER
 %token  <dbl_value> DOUBLE
-
+%type   <number>        number
+                        
 /* program nonterminal allows us to handle empty input and
  * process the parse finish
  */
@@ -57,17 +62,17 @@ program          : {}
 assignments      : assignment { printf("first assigment\n"); }
         |       assignments SEMICOLON assignment { printf("one more assignment\n"); }
 
-number           : INTEGER
-        |       DOUBLE
+number           : INTEGER { $<number>$.is_int = 1; $<number>$.int_val = $1; }
+        |       DOUBLE { $<number>$.is_int = 0; $<number>$.dbl_val = $1; }
 
 matrix           : OPENPAREN matrix_contents CLOSEPAREN
 
 /* contents is a separated list with optional semicolon */
-matrix_contents  : separated_list  { printf("matrix\n"); }
-        |       separated_list SEMICOLON { printf("matrix\n"); }
+matrix_contents  : separated_list  { printf("matrix done\n"); }
+        |       separated_list SEMICOLON { printf("matrix done\n"); }
 
-separated_list   : matrix_row
-        |       separated_list SEMICOLON matrix_row
+separated_list   : matrix_row { printf("first row done\n"); }
+        |       separated_list SEMICOLON matrix_row { printf("next row done\n"); }
 
 /* matrix row is a list of numbers separated by comma,
  * with the optional comma at the end
@@ -75,8 +80,8 @@ separated_list   : matrix_row
 matrix_row       : numbers_list
         |       numbers_list COMMA
 
-numbers_list     : number
-        |       numbers_list COMMA number
+numbers_list     : number { printf($1.is_int ? "first %d " : "first %f ", $1.is_int ? $1.int_val : $1.dbl_val); }
+        |       numbers_list COMMA number { printf($3.is_int ? "rest %d " : "rest %f ", $3.is_int ? $3.int_val : $3.dbl_val); }
 
 assignment    : IDENTIFIER ASSIGNMENT INTEGER { struct kv_value_t val; kv_init_int(&val, $3); kv_table_put($1, &val); }
         |       IDENTIFIER ASSIGNMENT DOUBLE { struct kv_value_t val; kv_init_double(&val, $3); kv_table_put($1, &val); }
