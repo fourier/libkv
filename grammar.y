@@ -126,6 +126,7 @@ separated_list   : matrix_row {
               sprintf(msg, "Incorrect row size %d for matrix with number of columns %d", $3->size, $<matrix>$->cols);
               yyerror(msg);
             }
+            free($3);
  }
 
 /* matrix row is a list of numbers separated by comma,
