@@ -29,6 +29,13 @@ void kv_init_vector( kv_value_t* kv, const kv_vector_t* value)
   kv->data.pointer = (void*)value;
 }
 
+void kv_init_matrix(kv_value_t* kv, const kv_matrix_t* value)
+{
+  kv->type = VALUE_MATRIX;
+  kv->data.pointer = (void*)value;
+}
+
+
 value_type kv_type(const  kv_value_t* kv)
 {
   return kv->type;
@@ -69,6 +76,8 @@ void kv_value_print(const  kv_value_t* kv)
     printf("\n");    
     break;
   case VALUE_MATRIX:
+    printf("matrix:\n");
+    kv_matrix_print((const kv_matrix_t*)kv->data.pointer);
     break;
   default:
     break;

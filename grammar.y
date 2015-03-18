@@ -68,8 +68,8 @@ program          : {}
         |       assignments SEMICOLON { kv_table_dump(); }
 
 /* assignments are semicolon-separated */
-assignments      : assignment { printf("first assigment\n"); }
-        |       assignments SEMICOLON assignment { printf("one more assignment\n"); }
+assignments      : assignment 
+        |       assignments SEMICOLON assignment
 
 /* number is a nonterminal for heterogeneous vector/matrix */
 number           : INTEGER { KV_NUMBER_SET_INT($<num>$, $1); }
@@ -109,19 +109,23 @@ vector_column     : number SEMICOLON number {
 
 
 matrix           : OPENPAREN matrix_contents CLOSEPAREN
-                { $<matrix>$ = $2; }
+                { $<matrix>$ = $2; printf("matrix done\n"); }
 
 /* contents is a separated list with optional semicolon */
-matrix_contents  : separated_list  { $<matrix>$ = $1; printf("matrix done\n"); }
-        |       separated_list SEMICOLON { $<matrix>$ = $1; printf("matrix done\n"); }
+matrix_contents  : separated_list  { $<matrix>$ = $1; }
+        |       separated_list SEMICOLON { $<matrix>$ = $1; }
 
 separated_list   : matrix_row {
             $<matrix>$ = kv_matrix_alloc($1);
-            printf("first row done\n");
+            free($1);
 }
         |       separated_list SEMICOLON matrix_row {
-            kv_matrix_add_row($<matrix>$, $3);
-            printf("next row done\n");
+            if (kv_matrix_add_row($<matrix>$, $3))
+            {
+              char msg[80];
+              sprintf(msg, "Incorrect row size %d for matrix with number of columns %d", $3->size, $<matrix>$->cols);
+              yyerror(msg);
+            }
  }
 
 /* matrix row is a list of numbers separated by comma,
@@ -139,8 +143,8 @@ numbers_list     : number COMMA number { $<vector>$ = kv_vector_alloc_two_elts(&
 /* all possible assignments */
 assignment    : IDENTIFIER ASSIGNMENT INTEGER { struct kv_value_t val; kv_init_int(&val, $3); kv_table_put($1, &val); }
         |       IDENTIFIER ASSIGNMENT DOUBLE { struct kv_value_t val; kv_init_double(&val, $3); kv_table_put($1, &val); }
-        |       IDENTIFIER ASSIGNMENT matrix
         |       IDENTIFIER ASSIGNMENT vector { struct kv_value_t val; kv_init_vector(&val, $3); kv_table_put($1, &val); }
+        |       IDENTIFIER ASSIGNMENT matrix { struct kv_value_t val; kv_init_matrix(&val, $3); kv_table_put($1, &val); }
         |       IDENTIFIER ASSIGNMENT STRING { struct kv_value_t val; kv_init_string(&val, $3); kv_table_put($1, &val); }
 
 %%

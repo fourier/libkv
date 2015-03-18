@@ -3,6 +3,7 @@
 #define KV_H
 
 #include "kv_vector.h"
+#include "kv_matrix.h"
 
 typedef enum {
   VALUE_STRING,
@@ -28,6 +29,7 @@ void kv_init_int(kv_value_t* kv, int value);
 void kv_init_double(kv_value_t* kv, double value);
 void kv_init_string(kv_value_t* kv, const char* value);
 void kv_init_vector(kv_value_t* kv, const kv_vector_t* value);
+void kv_init_matrix(kv_value_t* kv, const kv_matrix_t* value);
 
 /**
  * getters
