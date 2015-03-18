@@ -23,7 +23,7 @@
 #include "libkv.tab.h"
 #include "libkv.h"
 
-
+int yyparse();
 
 int main(int argc, const char* argv[])
 {
