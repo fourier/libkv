@@ -13,7 +13,7 @@
 /* key-value bucket */
 struct kv_bucket
 { 
-  const char* name;
+  char* name;
   struct kv_value_t value;
   struct kv_bucket* next;
 };
@@ -58,7 +58,8 @@ void kv_table_put(const char* name, struct kv_value_t* value)
     if (!bucket)                /* create a new */
     {
       bucket = malloc(sizeof(*bucket));
-      bucket->name = strdup(name);
+      bucket->name = malloc(strlen(name)+1);
+      strcpy(bucket->name, name);
       bucket->next = 0;
       /* member-wise copy */
       bucket->value = *value;
