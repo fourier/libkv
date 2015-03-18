@@ -42,7 +42,6 @@ kv_matrix_t* kv_matrix_alloc(const struct kv_vector_t* vec)
   kv_matrix_t* mtx = malloc(sizeof(kv_matrix_t));
   assert(mtx);
   kv_matrix_init_with_row(mtx, vec);
-  printf("matrix with row of size %d created\n", mtx->cols);
   return mtx;
 }
 

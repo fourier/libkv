@@ -109,7 +109,7 @@ vector_column     : number SEMICOLON number {
 
 
 matrix           : OPENPAREN matrix_contents CLOSEPAREN
-                { $<matrix>$ = $2; printf("matrix done\n"); }
+                { $<matrix>$ = $2; }
 
 /* contents is a separated list with optional semicolon */
 matrix_contents  : separated_list  { $<matrix>$ = $1; }
