@@ -1,9 +1,6 @@
 %{
 #include <stdio.h>
 
-/* #include "atomtoken.h" */
-/* #include "sexpitem.h" */
-
 /* error handler */
 void yyerror (char const *s);
 /* lexer forward declaration */
@@ -142,36 +139,16 @@ numbers_list     : number COMMA number { $<vector>$ = kv_vector_alloc_two_elts(&
 
 
 /* all possible assignments */
-assignment    : IDENTIFIER ASSIGNMENT INTEGER { struct kv_value_t val; kv_init_int(&val, $3); kv_table_put($1, &val); }
-        |       IDENTIFIER ASSIGNMENT DOUBLE { struct kv_value_t val; kv_init_double(&val, $3); kv_table_put($1, &val); }
-        |       IDENTIFIER ASSIGNMENT vector { struct kv_value_t val; kv_init_vector(&val, $3); kv_table_put($1, &val); }
-        |       IDENTIFIER ASSIGNMENT matrix { struct kv_value_t val; kv_init_matrix(&val, $3); kv_table_put($1, &val); }
-        |       IDENTIFIER ASSIGNMENT STRING { struct kv_value_t val; kv_init_string(&val, $3); kv_table_put($1, &val); }
+assignment    : IDENTIFIER ASSIGNMENT INTEGER { struct kv_value_t val; kv_init_int(&val, $3); kv_table_put($1, &val); free((char*)$1); }
+        |       IDENTIFIER ASSIGNMENT DOUBLE { struct kv_value_t val; kv_init_double(&val, $3); kv_table_put($1, &val); free((char*)$1); }
+        |       IDENTIFIER ASSIGNMENT vector { struct kv_value_t val; kv_init_vector(&val, $3); kv_table_put($1, &val); free((char*)$1); }
+        |       IDENTIFIER ASSIGNMENT matrix { struct kv_value_t val; kv_init_matrix(&val, $3); kv_table_put($1, &val); free((char*)$1); }
+        |       IDENTIFIER ASSIGNMENT STRING { struct kv_value_t val; kv_init_string(&val, $3); kv_table_put($1, &val); free((char*)$1); }
 
 %%
 
 
 
-/* sexp_item* sexp_parse_file(FILE* input) */
-/* { */
-/*     sexp_item* result = 0; */
-/*     yyin = input; */
-/*     if (yyparse() == 0) result = g_parsed; */
-/*     yylex_destroy(); */
-    
-/*     return result; */
-/* } */
-
-
-/* sexp_item* sexp_parse_str(const char* read_buffer) */
-/* { */
-/*     sexp_item* result = 0; */
-/*     yy_scan_string(read_buffer); */
-/*     if (yyparse() == 0) result = g_parsed; */
-/*     yylex_destroy(); */
-    
-/*     return result; */
-/* } */
 
 
 

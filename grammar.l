@@ -8,7 +8,6 @@
    #include <inttypes.h>
    #include <stdio.h>
 
-   //#include "atomtoken.h"
    #include "libkv.tab.h"
    const char* g_filename = 0;
    void yyerror (char const *s);
@@ -60,8 +59,6 @@ comment               [#%].*\n
 %%
 
 {integer-number}        {
-      //yylval.atom = atom_token_integer_alloc(yytext,yytext+yyleng);
-      //return ATOM;
       int value = strtol(yytext, 0, 10);
       if (g_verbose) printf("Integer: %d\n", value);
       yylval.int_value = value;
@@ -69,8 +66,6 @@ comment               [#%].*\n
     }
     
 {floating-point-number} {
-      /* yylval.atom = atom_token_float_alloc(yytext,yytext+yyleng); */
-      /* return ATOM; */
       double value = strtod(yytext, 0);
       if (g_verbose) printf("Double: %f\n", value);
       yylval.dbl_value = value;
@@ -78,8 +73,6 @@ comment               [#%].*\n
     }
     
 {string}                {
-      /* yylval.atom = atom_token_string_alloc(yytext+1,yytext+yyleng-1); */
-      /* return ATOM; */
       char* str = malloc(yyleng-1);
       memcpy(str, yytext+1, yyleng-2);
       str[yyleng-1] = '\0';
@@ -89,8 +82,6 @@ comment               [#%].*\n
     }
 
 {identifier}                {
-      /* yylval.atom = atom_token_symbol_alloc(yytext,yytext+yyleng); */
-      /* return ATOM;     */
       char* str = malloc(yyleng+1);
       memcpy(str, yytext, yyleng);
       str[yyleng] = '\0';
