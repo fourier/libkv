@@ -73,7 +73,8 @@ void kv_table_put(const char* name, struct kv_value_t* value)
   else                          /* new element */
   {
     bucket = malloc(sizeof(*bucket));
-    bucket->name = strdup(name);
+    bucket->name = malloc(strlen(name)+1);
+    strcpy(bucket->name, name);
     bucket->next = 0;
     /* member-wise copy */
     bucket->value = *value;
