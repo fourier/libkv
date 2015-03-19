@@ -17,7 +17,7 @@ struct kv_table_t* libkv_parse_file(FILE* file)
   yyin = file;
   if (yyparse(table))
   {
-    kv_table_free(table);
+    kv_table_deep_free(table);
     return 0;
   }
   return table;
@@ -32,7 +32,7 @@ struct kv_table_t* libkv_parse_string(const char* string)
   yy_switch_to_buffer( string_buffer ); 
   if (yyparse(table))
   {
-    kv_table_free(table);
+    kv_table_deep_free(table);
     return 0;
   }
 

@@ -12,6 +12,7 @@ struct kv_table_t;
  */
 struct kv_table_t* kv_table_alloc();
 void kv_table_free(struct kv_table_t* table);
+void kv_table_deep_free(struct kv_table_t* table);
 
 /**
  * getters and setters

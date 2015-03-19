@@ -30,6 +30,10 @@ void kv_init_double(kv_value_t* kv, double value);
 void kv_init_string(kv_value_t* kv, const char* value);
 void kv_init_vector(kv_value_t* kv, const kv_vector_t* value);
 void kv_init_matrix(kv_value_t* kv, const kv_matrix_t* value);
+/**
+ * destructor (doesn't deallocate the struct itself)
+ */
+void kv_fini(kv_value_t* kv); 
 
 /**
  * getters

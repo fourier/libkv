@@ -4,6 +4,8 @@
 
 /* system includes */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void kv_init_int( kv_value_t* kv, int value)
 {
@@ -33,6 +35,29 @@ void kv_init_matrix(kv_value_t* kv, const kv_matrix_t* value)
 {
   kv->type = VALUE_MATRIX;
   kv->data.pointer = (void*)value;
+}
+
+void kv_fini(kv_value_t* kv)
+{
+  switch (kv->type)
+  {
+  case VALUE_STRING:
+    free(kv->data.pointer);
+    break;
+  case VALUE_VECTOR:
+    kv_vector_fini((kv_vector_t*)kv->data.pointer);
+    free(kv->data.pointer);
+    break;
+  case VALUE_MATRIX:
+    kv_matrix_fini((kv_matrix_t*)kv->data.pointer);
+    free(kv->data.pointer);
+    break;
+  case VALUE_DOUBLE:
+  case VALUE_INTEGER:
+  default:
+    break;
+  }
+  memset(kv, 0, sizeof(*kv));
 }
 
 
