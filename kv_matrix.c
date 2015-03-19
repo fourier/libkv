@@ -211,6 +211,7 @@ struct kv_vector_t* kv_matrix_convert_vector(kv_matrix_t* mtx)
   if (mtx->rows == 1)
   {
     vec->data = mtx->is_int ? (void*)((int**)mtx->data)[0] : (void*)((double**)mtx->data)[0];
+    free(mtx->data);
   }
   else
   {
