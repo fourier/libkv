@@ -74,41 +74,47 @@ static void kv_bucket_deep_free(kv_bucket_t* bucket)
 
 void kv_table_free(kv_table_t* table)
 {
-  int i;
-  for (i = 0; i < table->size; ++ i)
-    if (table->buckets[i])
-    {
-      kv_bucket_t* bucket = table->buckets[i];
-      kv_bucket_t* last = bucket;
-      while (bucket)
+  if (table)
+  {
+    int i;
+    for (i = 0; i < table->size; ++ i)
+      if (table->buckets[i])
       {
-        last = bucket;
-        bucket = bucket->next;
-        kv_bucket_free(last);
+        kv_bucket_t* bucket = table->buckets[i];
+        kv_bucket_t* last = bucket;
+        while (bucket)
+        {
+          last = bucket;
+          bucket = bucket->next;
+          kv_bucket_free(last);
+        }
       }
-    }
-  free(table->buckets);
-  free(table);
-  memset(table, 0, sizeof (*table));
+    free(table->buckets);
+    free(table);
+    memset(table, 0, sizeof (*table));
+  }
 }
 
 void kv_table_deep_free(struct kv_table_t* table)
 {
+  if (table)
+  {
     int i;
-  for (i = 0; i < table->size; ++ i)
-    if (table->buckets[i])
-    {
-      kv_bucket_t* bucket = table->buckets[i];
-      kv_bucket_t* last = bucket;
-      while (bucket)
+    for (i = 0; i < table->size; ++ i)
+      if (table->buckets[i])
       {
-        last = bucket;
-        bucket = bucket->next;
-        kv_bucket_deep_free(last);
+        kv_bucket_t* bucket = table->buckets[i];
+        kv_bucket_t* last = bucket;
+        while (bucket)
+        {
+          last = bucket;
+          bucket = bucket->next;
+          kv_bucket_deep_free(last);
+        }
       }
-    }
-  free(table->buckets);
-  free(table);
+    free(table->buckets);
+    free(table);
+  }
 }
 
 
