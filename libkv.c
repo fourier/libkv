@@ -11,8 +11,6 @@ struct kv_table_t* libkv_parse_file(FILE* file)
 {
   struct kv_table_t* table = kv_table_alloc();
   assert(file);
-  if (g_verbose)
-    printf("verbose\n");
   yyin = file;
   yyparse(table);
   
