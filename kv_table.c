@@ -57,6 +57,7 @@ static void kv_bucket_free(kv_bucket_t* bucket)
   if (bucket)
   {
     free(bucket->name);
+    free(bucket);
   }
 }
 
@@ -67,6 +68,7 @@ static void kv_bucket_deep_free(kv_bucket_t* bucket)
   {
     free(bucket->name);
     kv_fini(&bucket->value);
+    free(bucket);
   }
 }
 
