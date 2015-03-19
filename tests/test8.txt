@@ -1,0 +1,7 @@
+a = [1,2;
+# comment
+3, 4];
+# another comment
+b = 3.1a;
+# yet another comment
+c = 54;
