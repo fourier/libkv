@@ -53,7 +53,7 @@ libkv.yy.o: libkv.yy.c libkv.tab.c
 	$(CC) -c -ggdb -pg -o $@ $<
 
 libkv.yy.c: grammar.l
-	$(LEX) -f -o $@ $<
+	$(LEX) --header-file=libkv.yy.h -f -o $@ $<
 
 
 $(OUTPUT): $(OUTPUT_LIB) 

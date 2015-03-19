@@ -9,9 +9,7 @@
    #include <stdio.h>
 
    #include "libkv.tab.h"
-   const char* g_filename = 0;
-   void yyerror (char const *s);
-   static int g_verbose = 0;
+   void yyerror (struct kv_table_t* table, char const *s);
 }
 
 /* we don't need yywrap since we assume what we will
@@ -54,20 +52,18 @@ comma                 [[:space:]]*","[[:space:]]*
 semicolon             [[:space:]]*";"[[:space:]]*
                                                 
 /* comments */
-comment               [#%].*\n
+comment               [#%].*\n 
                         
 %%
 
 {integer-number}        {
       int value = strtol(yytext, 0, 10);
-      if (g_verbose) printf("Integer: %d\n", value);
       yylval.int_value = value;
       return INTEGER;
     }
     
 {floating-point-number} {
       double value = strtod(yytext, 0);
-      if (g_verbose) printf("Double: %f\n", value);
       yylval.dbl_value = value;
       return DOUBLE;
     }
@@ -76,7 +72,6 @@ comment               [#%].*\n
       char* str = malloc(yyleng-1);
       memcpy(str, yytext+1, yyleng-2);
       str[yyleng-1] = '\0';
-      if (g_verbose) printf("String: %s\n", str);
       yylval.string = str;
       return STRING;
     }
@@ -85,56 +80,47 @@ comment               [#%].*\n
       char* str = malloc(yyleng+1);
       memcpy(str, yytext, yyleng);
       str[yyleng] = '\0';
-      if (g_verbose) printf("Identifier: %s\n", str);
       yylval.identifier = str;
       return IDENTIFIER;
     }
     
 {open-paren}            {
-      if (g_verbose) printf("Open paren\n");
       return OPENPAREN;
     }
 
 {close-paren}           {
-      if (g_verbose) printf("Close paren\n");
       return CLOSEPAREN;
     }
 
 {assign}           {
-      if (g_verbose) printf("Assign\n");
       return ASSIGNMENT;
     }
 
 {comma}           {
-      if (g_verbose) printf("Comma\n");
       return COMMA;
     }
 
 {semicolon}           {
-      if (g_verbose) printf("Semicolon\n");
       return SEMICOLON;
     }
 
 {comment}           {
-      if (g_verbose) printf("Comment\n");
       /* return CLOSEPAREN; */
     }
                 
-[\n \t]+          /* eat up whitespace */
+[\n \t]+          /* eat up whitespace */ {}
+
 
 .                   {
       char message[25];
-      sprintf(message, "Unknown character %c\n", yytext[0]);
-      yyerror(message);
+      sprintf(message, "Unknown character '%c'", yytext[0]);
+      yyerror(0, message);
     }
 
 %%
 
-void yyerror (char const *s)
+void yyerror (struct kv_table_t* table, char const *s)
 {
-  if (g_filename) 
-    fprintf(stderr, "%s:%d: %s at %s\n", g_filename, yylineno, s, yytext);
-  else
-    fprintf(stderr, "%d: %s at %s\n", yylineno, s, yytext);
+    fprintf(stderr, "%d: %s\n", yylineno, s, yytext);
 }
 

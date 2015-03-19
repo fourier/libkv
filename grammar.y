@@ -1,12 +1,12 @@
 %{
 #include <stdio.h>
 
-/* error handler */
-//void yyerror (struct kv_table_t* table, char const *s);
 /* lexer forward declaration */
+/*
 int yylex(void);
 int yylex_destroy (void );
 void* yy_scan_string (const char *yy_str);
+*/
 
 /* increase limit for maximum number of shift states
  * without reduce - necessary for big files
@@ -17,8 +17,9 @@ void* yy_scan_string (const char *yy_str);
 extern FILE* yyin;
 
 %}
-/*  parsing argument */                       
-%parse-param {struct kv_table_t* table} 
+/* parsing argument - supplied to yyparse */                       
+%parse-param {struct kv_table_t* table}
+/* verbose error messages */
 /* allow debug mode */
 %debug
 /* code to be placed to the header file */
@@ -59,12 +60,13 @@ extern FILE* yyin;
 %start program
 
 %%
-program          : { kv_table_alloc(); }
-        |       assignments SEMICOLON { kv_table_dump(table); }
+program          : {}
+        |       assignments {}
+
 
 /* assignments are semicolon-separated */
-assignments      : assignment 
-        |       assignments SEMICOLON assignment
+assignments      : assignment SEMICOLON
+        |       assignments assignment SEMICOLON
 
 /* number is a nonterminal for heterogeneous vector/matrix */
 number           : INTEGER { KV_NUMBER_SET_INT($<num>$, $1); }
@@ -119,7 +121,9 @@ separated_list   : matrix_row {
             {
               char msg[80];
               sprintf(msg, "Incorrect row size %d for matrix with number of columns %d", $3->size, $<matrix>$->cols);
-              yyerror(msg);
+              yyerror(table, msg);
+              free($3);
+              YYABORT;
             }
             free($3);
  }
@@ -142,6 +146,7 @@ assignment    : IDENTIFIER ASSIGNMENT INTEGER { struct kv_value_t val; kv_init_i
 |       IDENTIFIER ASSIGNMENT vector { struct kv_value_t val; kv_init_vector(&val, $3); kv_table_put(table, $1, &val); free((char*)$1); }
 |       IDENTIFIER ASSIGNMENT matrix { struct kv_value_t val; kv_init_matrix(&val, $3); kv_table_put(table, $1, &val); free((char*)$1); }
 |       IDENTIFIER ASSIGNMENT STRING { struct kv_value_t val; kv_init_string(&val, $3); kv_table_put(table, $1, &val); free((char*)$1); }
+
 
 %%
 

@@ -8,4 +8,9 @@
 #include "kv_vector.h"
 #include "kv_matrix.h"
 
+#include <stdio.h>
+
+struct kv_table_t* libkv_parse_file(FILE* file);
+struct kv_table_t* libkv_parse_string(const char* string);
+
 #endif /* LIBKV_H */

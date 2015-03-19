@@ -20,20 +20,19 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "libkv.tab.h"
 #include "libkv.h"
-
-int yyparse();
 
 int main(int argc, const char* argv[])
 {
-  struct kv_table_t* table = kv_table_alloc();
+  FILE* file;
+  struct kv_table_t* table;
   ++argv, --argc;  /* skip over program name */
-  /* if ( argc > 0 ) */
-  /*   yyin = fopen( argv[0], "r" ); */
-  /* else */
-  /*   yyin = stdin; */
-  
-  yyparse(table);
+  if ( argc > 0 )
+    file  = fopen( argv[0], "r" );
+  else
+    file = stdin;
+  table = libkv_parse_file(file);
+  if (table)
+    kv_table_dump(table);
   return 0;
 }
