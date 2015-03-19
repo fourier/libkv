@@ -81,6 +81,16 @@ const char* kv_string(const  kv_value_t* kv)
   return (const char*)kv->data.pointer;
 }
 
+const kv_vector_t* kv_vector(const kv_value_t* kv)
+{
+  return (const kv_vector_t*)kv->data.pointer;
+}
+
+const kv_matrix_t* kv_matrix(const kv_value_t* kv)
+{
+  return (const kv_matrix_t*)kv->data.pointer;
+}
+
 
 void kv_value_print(const  kv_value_t* kv)
 {

@@ -12,7 +12,6 @@ struct kv_table_t;
  */
 struct kv_table_t* kv_table_alloc();
 void kv_table_free(struct kv_table_t* table);
-void kv_table_deep_free(struct kv_table_t* table);
 
 /**
  * getters and setters
@@ -24,6 +23,11 @@ void kv_table_put(struct kv_table_t* table, const char* name, struct kv_value_t*
  * auxulary methods
  */
 void kv_table_dump(const struct kv_table_t* table);
+/**
+ * remove identifier from the table without freeing contents.
+ * Useful when ownership is already transferred by using kv_table_get
+ */
+void kv_table_drop(struct kv_table_t* table, const char* name);
 
 
 #endif /* KV_TABLE_H */

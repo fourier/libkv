@@ -39,11 +39,11 @@ void kv_fini(kv_value_t* kv);
  * getters
  */
 value_type kv_type(const kv_value_t* kv);
-
-  
 int kv_int(const kv_value_t* kv);
 double kv_double(const kv_value_t* kv);
 const char* kv_string(const kv_value_t* kv);
+const kv_vector_t* kv_vector(const kv_value_t* kv);
+const kv_matrix_t* kv_matrix(const kv_value_t* kv);
 
 /**
  * Auxulary methods

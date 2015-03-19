@@ -32,9 +32,10 @@ int main(int argc, const char* argv[])
   else
     file = stdin;
   table = libkv_parse_file(file);
-  /*table = libkv_parse_string("a = [1,2;3,4];\n b = \"hello\";"); */
   if (table)
+  {
     kv_table_dump(table);
-  kv_table_deep_free(table);
+  }
+  kv_table_free(table);
   return 0;
 }

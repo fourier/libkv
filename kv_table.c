@@ -33,7 +33,7 @@ typedef struct kv_table_t
  */
 static long hash_function(int size,const char* str)
 {
-  /* Constant for hash function from K&P*/
+  /* Constant for hash function from K&P */
   static const int MULTIPLIER = 31;      /* other can be 37 */
 
   long h = 0;
@@ -61,7 +61,6 @@ static void kv_bucket_free(kv_bucket_t* bucket)
   }
 }
 
-
 static void kv_bucket_deep_free(kv_bucket_t* bucket)
 {
   if (bucket)
@@ -72,30 +71,7 @@ static void kv_bucket_deep_free(kv_bucket_t* bucket)
   }
 }
 
-void kv_table_free(kv_table_t* table)
-{
-  if (table)
-  {
-    int i;
-    for (i = 0; i < table->size; ++ i)
-      if (table->buckets[i])
-      {
-        kv_bucket_t* bucket = table->buckets[i];
-        kv_bucket_t* last = bucket;
-        while (bucket)
-        {
-          last = bucket;
-          bucket = bucket->next;
-          kv_bucket_free(last);
-        }
-      }
-    free(table->buckets);
-    free(table);
-    memset(table, 0, sizeof (*table));
-  }
-}
-
-void kv_table_deep_free(struct kv_table_t* table)
+void kv_table_free(struct kv_table_t* table)
 {
   if (table)
   {
@@ -121,7 +97,39 @@ void kv_table_deep_free(struct kv_table_t* table)
 const struct kv_value_t* kv_table_get(kv_table_t* table, const char* name)
 {
   kv_bucket_t* bucket = table->buckets[hash_function(table->size, name)];
+  while (bucket && strcmp(name, bucket->name))
+  {
+    bucket = bucket->next;
+  }
+  
   return bucket ? &bucket->value : 0;
+}
+
+void kv_table_drop(struct kv_table_t* table, const char* name)
+{
+  kv_bucket_t* bucket = table->buckets[hash_function(table->size, name)];
+  kv_bucket_t* prev = bucket;
+  while (bucket && strcmp(name, bucket->name))
+  {
+    prev = bucket;
+    bucket = bucket->next;
+  }
+  if (bucket)
+  {
+    kv_bucket_t* next = bucket->next;
+    if (prev == bucket)         /* if it was the 1st in row */
+    {
+      table->buckets[hash_function(table->size, name)] = next;
+    }
+    else
+    {
+      prev->next = next;
+    }
+    kv_bucket_free(bucket);
+  }
+  
+  assert(table);
+  assert(name);
 }
 
 void kv_table_put(kv_table_t* table, const char* name, struct kv_value_t* value)
