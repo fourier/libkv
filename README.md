@@ -11,9 +11,9 @@ Every assignment should ends with semicolon ';'. The r-values (types) are the fo
 * arrays of integers or floats: ```vec = [1;2;3];```
 * matrix of integers or floats:
 ```MATLAB
-mtx = [1, 2, 3;
-4, 5, -1.5;
-0, -1.2, 4];
+mtx = [1,    2,    3;
+       4,    5, -1.5;
+       0, -1.2,    4];
 ```
 Newlines and comments (starting with *#* or *%*) are ignored.
 
@@ -56,3 +56,10 @@ kv_table_free(table);
 ```
 
 Deallocate the table using the ```kv_table_free``` method. It will perform *deep* deallocation, therefore copy values or take ownership and drop them from table before deallocating.
+
+### Note on matricies and vectors
+The library assumes integers in input until it encounters the first floating-point value. When the library converts the vector/matrix to the double format.
+
+The vector-row or vector-column interpreted by the library equally and represented as ```kv_vector_t```.
+
+

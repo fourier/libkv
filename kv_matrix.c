@@ -201,3 +201,36 @@ void kv_matrix_print(const kv_matrix_t* mtx)
     }
   }
 }
+
+struct kv_vector_t* kv_matrix_convert_vector(kv_matrix_t* mtx)
+{
+  struct kv_vector_t* vec = malloc(sizeof(*vec));
+  vec->is_int = mtx->is_int;
+  vec->size = mtx->rows*mtx->cols;
+  vec->reserved = vec->size;
+  if (mtx->rows == 1)
+  {
+    vec->data = mtx->is_int ? (void*)((int**)mtx->data)[0] : (void*)((double**)mtx->data)[0];
+  }
+  else
+  {
+    int i;
+    if (mtx->is_int)
+    {
+      int* row = malloc(mtx->rows*mtx->cols*sizeof(int));
+      for (i = 0; i < mtx->rows; ++ i)
+        memcpy(row + mtx->cols, ((int**)mtx->data)[i], mtx->cols*sizeof(int));
+      vec->data = row;
+    }
+    else
+    {
+      double* row = malloc(mtx->rows*mtx->cols*sizeof(double));
+      for (i = 0; i < mtx->rows; ++ i)
+        memcpy(row + mtx->cols, ((double**)mtx->data)[i], mtx->cols*sizeof(double));
+      vec->data = row;
+    }
+    kv_matrix_fini(mtx);
+  }
+  memset(mtx, 0, sizeof(*mtx));
+  return vec;
+}

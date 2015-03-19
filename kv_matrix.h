@@ -52,6 +52,14 @@ void kv_matrix_fini(kv_matrix_t* mtx);
  * returns 0 if ok
  */
 int kv_matrix_add_row(kv_matrix_t* mtx, const struct kv_vector_t* vec);
+
+/**
+ * Auxulary methods
+ */
 void kv_matrix_print(const kv_matrix_t* mtx);
+/**
+ * converting matrix to vector, deallocating itself
+ */
+struct kv_vector_t* kv_matrix_convert_vector(kv_matrix_t* mtx);
 
 #endif /* KV_MATRIX_H */

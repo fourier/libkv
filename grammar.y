@@ -172,7 +172,18 @@ numbers_list     : number COMMA number { $<vector>$ = kv_vector_alloc_two_elts(&
 assignment    : IDENTIFIER ASSIGNMENT INTEGER { struct kv_value_t val; kv_init_int(&val, $3); kv_table_put(table, $1, &val); free((char*)$1); }
 |       IDENTIFIER ASSIGNMENT DOUBLE { struct kv_value_t val; kv_init_double(&val, $3); kv_table_put(table, $1, &val); free((char*)$1); }
 |       IDENTIFIER ASSIGNMENT vector { struct kv_value_t val; kv_init_vector(&val, $3); kv_table_put(table, $1, &val); free((char*)$1); }
-|       IDENTIFIER ASSIGNMENT matrix { struct kv_value_t val; kv_init_matrix(&val, $3); kv_table_put(table, $1, &val); free((char*)$1); }
+|       IDENTIFIER ASSIGNMENT matrix {
+    struct kv_value_t val;
+    if ($3->rows == 1)
+    {
+        kv_init_vector(&val, kv_matrix_convert_vector($3));
+        free($3);
+    }
+    else
+      kv_init_matrix(&val, $3);
+    kv_table_put(table, $1, &val);
+    free((char*)$1);
+ }
 |       IDENTIFIER ASSIGNMENT STRING { struct kv_value_t val; kv_init_string(&val, $3); kv_table_put(table, $1, &val); free((char*)$1); }
 
 
