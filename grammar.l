@@ -69,9 +69,10 @@ comment               [#%].*\n
     }
     
 {string}                {
-      char* str = malloc(yyleng-1);
-      memcpy(str, yytext+1, yyleng-2);
-      str[yyleng-1] = '\0';
+      int size = yyleng-2; /* skip quotation characters */
+      char* str = malloc(size+1); /* including 0 */
+      memcpy(str, yytext+1, size);
+      str[size] = '\0';
       yylval.string = str;
       return STRING;
     }

@@ -122,9 +122,16 @@ separated_list   : matrix_row {
               char msg[80];
               sprintf(msg, "Incorrect row size %d for matrix with number of columns %d", $3->size, $<matrix>$->cols);
               yyerror(table, msg);
+              /* free the matrix contents */
               kv_matrix_fini($<matrix>$);
+              /* free the matrix struct */
               free($<matrix>$);
+              /* free the vector contents */
+              kv_vector_fini($3);
+              /* free the vector struct */
               free($3);
+              /* free the identifier 3 steps above in stack */
+              free((char*)yyvsp[-3].identifier);
               YYABORT;
             }
             free($3);
