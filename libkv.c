@@ -15,15 +15,26 @@ struct kv_table_t* libkv_parse_file(FILE* file)
   struct kv_table_t* table = kv_table_alloc();
   assert(file);
   yyin = file;
-  yyparse(table);
-  
+  if (yyparse(table))
+  {
+    kv_table_free(table);
+    return 0;
+  }
   return table;
 }
 
 struct kv_table_t* libkv_parse_string(const char* string)
 {
   struct kv_table_t* table = kv_table_alloc();
+  YY_BUFFER_STATE string_buffer;
   assert(string);
+  string_buffer = yy_scan_string(string); 
+  yy_switch_to_buffer( string_buffer ); 
+  if (yyparse(table))
+  {
+    kv_table_free(table);
+    return 0;
+  }
 
   return table;
 }

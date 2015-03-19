@@ -111,16 +111,12 @@ comment               [#%].*\n
 [\n \t]+          /* eat up whitespace */ {}
 
 
-.                   {
-      char message[25];
-      sprintf(message, "Unknown character '%c'", yytext[0]);
-      yyerror(0, message);
-    }
+.                   {} /* ignore all other characters */
 
 %%
 
 void yyerror (struct kv_table_t* table, char const *s)
 {
-    fprintf(stderr, "%d: %s\n", yylineno, s, yytext);
+    fprintf(stderr, "error in line %d: %s\n", yylineno, s, yytext);
 }
 
