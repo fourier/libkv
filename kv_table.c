@@ -6,19 +6,26 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 /* simple hash table of fixed size */
 #define HASH_ELTS 9997
 
 /* key-value bucket */
-struct kv_bucket
+typedef struct kv_bucket_t
 { 
   char* name;
   struct kv_value_t value;
-  struct kv_bucket* next;
-};
+  struct kv_bucket_t* next;
+} kv_bucket_t;
 
-static struct kv_bucket* hash_table[HASH_ELTS];
+/* table containing fixed size array of buckets */
+typedef struct kv_table_t
+{
+  kv_bucket_t** buckets;
+  int size;
+} kv_table_t;
+
 
 /*
  * Hash function for strings, from K&P "The Practice of Programming"
@@ -36,20 +43,37 @@ static long hash_function(int size,const char* str)
   return h % size;
 }
 
-const struct kv_value_t* kv_table_get(const char* name)
+kv_table_t* kv_table_alloc()
 {
-  struct kv_bucket* bucket = hash_table[hash_function(HASH_ELTS, name)];
+  kv_table_t* table = malloc(sizeof(*table));
+  table->size = HASH_ELTS;
+  table->buckets = malloc(sizeof(kv_bucket_t*)*table->size);
+  memset(table->buckets, 0, sizeof(kv_bucket_t*)*table->size);
+  return table;
+}
+
+void kv_table_free(kv_table_t* table)
+{
+  
+  free(table->buckets);
+  free(table);
+}
+
+
+const struct kv_value_t* kv_table_get(kv_table_t* table, const char* name)
+{
+  kv_bucket_t* bucket = table->buckets[hash_function(table->size, name)];
   return bucket ? &bucket->value : 0;
 }
 
-void kv_table_put(const char* name, struct kv_value_t* value)
+void kv_table_put(kv_table_t* table, const char* name, struct kv_value_t* value)
 {
-  long hash_index = hash_function(HASH_ELTS, name);
-  struct kv_bucket* bucket = hash_table[hash_index];
+  long hash_index = hash_function(table->size, name);
+  kv_bucket_t* bucket = table->buckets[hash_index];
   /* find hash collisions */
   if (bucket)
   {
-    struct kv_bucket* last = bucket;
+    kv_bucket_t* last = bucket;
     while (bucket && strcmp(name, bucket->name))
     {
       last = bucket;
@@ -78,25 +102,25 @@ void kv_table_put(const char* name, struct kv_value_t* value)
     bucket->next = 0;
     /* member-wise copy */
     bucket->value = *value;
-    hash_table[hash_index] = bucket;
+    table->buckets[hash_index] = bucket;
   }
   
 }
 
 
-static void kv_table_dump_bucket(struct kv_bucket* bucket)
+static void kv_table_dump_bucket(kv_bucket_t* bucket)
 {
   printf("Identifier: %s\n", bucket->name);
   kv_value_print(&bucket->value);
 }
 
-void kv_table_dump()
+void kv_table_dump(const kv_table_t* table)
 {
   int i = 0;
-  for (; i < HASH_ELTS; ++ i)
+  for (; i < table->size; ++ i)
   {
-    struct kv_bucket* bucket;
-    if ((bucket = hash_table[i]))
+    kv_bucket_t* bucket;
+    if ((bucket = table->buckets[i]))
     {
       while (bucket)
       {

@@ -27,12 +27,13 @@ int yyparse();
 
 int main(int argc, const char* argv[])
 {
+  struct kv_table_t* table = kv_table_alloc();
   ++argv, --argc;  /* skip over program name */
   /* if ( argc > 0 ) */
   /*   yyin = fopen( argv[0], "r" ); */
   /* else */
   /*   yyin = stdin; */
-     
-  yyparse();
+  
+  yyparse(table);
   return 0;
 }

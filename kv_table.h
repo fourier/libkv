@@ -4,9 +4,25 @@
 
 #include "kv.h"
 
-const struct kv_value_t* kv_table_get(const char* name);
-void kv_table_put(const char* name, struct kv_value_t* value);
-void kv_table_dump();
+/* forward declaration of the identifiers table */
+struct kv_table_t;
+
+/**
+ * constructor and destructor
+ */
+struct kv_table_t* kv_table_alloc();
+void kv_table_free(struct kv_table_t* table);
+
+/**
+ * getters and setters
+ */
+const struct kv_value_t* kv_table_get(struct kv_table_t* table, const char* name);
+void kv_table_put(struct kv_table_t* table, const char* name, struct kv_value_t* value);
+
+/**
+ * auxulary methods
+ */
+void kv_table_dump(const struct kv_table_t* table);
 
 
 #endif /* KV_TABLE_H */
