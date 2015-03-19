@@ -122,6 +122,7 @@ separated_list   : matrix_row {
               char msg[80];
               sprintf(msg, "Incorrect row size %d for matrix with number of columns %d", $3->size, $<matrix>$->cols);
               yyerror(table, msg);
+              kv_matrix_fini($<matrix>$);
               free($3);
               YYABORT;
             }
