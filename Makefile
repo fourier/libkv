@@ -68,7 +68,7 @@ lint:
 	splint *.c
 
 clean :
-	rm $(OBJECTS) $(OUTPUT) $(OUTPUT_LIB) libkv.tab.c libkv.tab.h libkv.yy.c
+	rm $(OBJECTS) $(OUTPUT) $(OUTPUT_LIB) libkv.tab.c libkv.tab.h libkv.yy.c libkv.yy.h
 
 check-syntax: 
 	gcc -o nul -S ${CHK_SOURCES} 
