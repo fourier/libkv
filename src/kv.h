@@ -29,7 +29,7 @@ typedef enum {
   VALUE_DOUBLE,
   VALUE_INTEGER,
   VALUE_VECTOR,
-  VALUE_MATRIX,
+  VALUE_MATRIX
 } value_type;
 
 typedef struct kv_value_t {
