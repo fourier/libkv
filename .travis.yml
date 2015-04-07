@@ -3,7 +3,9 @@ compiler:
   - gcc
   - clang
 before_install:
-  sudo apt-cache search tup
-  #  sudo apt-get install tup
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update && sudo apt-get install -y tup; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install tup; fi
 # Change this to your needs
-script: tup init && tup 
+before_script:
+  - tup init
+script: tup 
