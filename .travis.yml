@@ -13,5 +13,5 @@ before_script:
 script: tup 
 
 os:
-  - linux
+  #  - linux
   - osx
