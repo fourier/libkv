@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with libkv.  If not, see <http://www.gnu.org/licenses/>.
 
-CC = gcc
+ifeq ($(CC),cc)
+	override CC = gcc
+endif
 LEX = flex
 YACC = bison
 
