@@ -47,7 +47,7 @@ libkv.tab.o: libkv.tab.c libkv.tab.h
 libkv.tab.h: src/grammar.y libkv.tab.c
 
 libkv.tab.c: src/grammar.y
-	$(YACC) -y --defines=libkv.tab.h -o libkv.tab.c -o $@ $<
+	$(YACC) -y --defines=libkv.tab.h -o $@ $<
 
 libkv.yy.o: libkv.yy.c libkv.tab.c
 	$(CC) -c -ggdb -pg $(INCLUDES) -o $@ $<
