@@ -1,6 +1,6 @@
 # -*- Mode: makefile; -*-
 
-# Copyright (C) 2011 Alexey Veretennikov (alexey dot veretennikov at gmail.com)
+# Copyright (C) 2015 Alexey Veretennikov (alexey dot veretennikov at gmail.com)
 # 
 #	This file is part of libkv.
 #
