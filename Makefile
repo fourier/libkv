@@ -21,14 +21,14 @@ CC = gcc
 LEX = flex
 YACC = bison
 
-CFLAGS = -ggdb -pg --std=c99 -pedantic -Wall -Wextra -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wdeclaration-after-statement -Wmissing-declarations 
-INCLUDES = -I .
+INCLUDES = -I . -I src
+CFLAGS = -ggdb -pg --std=c99 -pedantic -Wall -Wextra -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wdeclaration-after-statement -Wmissing-declarations $(INCLUDES)
 LINKFLAGS = -L. -lkv
 
-OUTPUT_SRC = main.c
-SOURCES := $(wildcard *.c)
-HEADERS := $(wildcard *.h)
-LEXES   := $(wildcard *.lex)
+OUTPUT_SRC = testsrc/main.c
+SOURCES := $(wildcard src/*.c) $(wildcard testsrc/*.c)
+HEADERS := $(wildcard src/*.h) $(wildcard testsrc/*.h)
+LEXES   := $(wildcard src/*.lex)
 OBJECTS := libkv.yy.o libkv.tab.o $(patsubst %.c,%.o,$(SOURCES)) 
 OBJECTS_LIB := $(filter-out $(patsubst %.c,%.o,$(OUTPUT_SRC)),$(OBJECTS))
 OUTPUT = kvtest
@@ -42,17 +42,17 @@ all: $(OUTPUT)
 	$(CC) -c $(CFLAGS) $(DEFINES) $(INCLUDES) $< -o $@
 
 libkv.tab.o: libkv.tab.c libkv.tab.h
-	$(CC) -c -ggdb -pg -o $@ $<
+	$(CC) -c -ggdb -pg $(INCLUDES) -o $@ $<
 
-libkv.tab.h: grammar.y libkv.tab.c
+libkv.tab.h: src/grammar.y libkv.tab.c
 
-libkv.tab.c: grammar.y
+libkv.tab.c: src/grammar.y
 	$(YACC) -y --defines=libkv.tab.h -o libkv.tab.c -o $@ $<
 
 libkv.yy.o: libkv.yy.c libkv.tab.c
-	$(CC) -c -ggdb -pg -o $@ $<
+	$(CC) -c -ggdb -pg $(INCLUDES) -o $@ $<
 
-libkv.yy.c: grammar.l
+libkv.yy.c: src/grammar.l
 	$(LEX) --header-file=libkv.yy.h -f -o $@ $<
 
 
