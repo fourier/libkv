@@ -21,15 +21,17 @@ CC = gcc
 AR = ar
 LEX = flex
 YACC = bison
-ifndef RELEASE
-  CFLAGS = -ggdb -pg -ansi -pedantic -Wall -Wextra -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wdeclaration-after-statement -Wmissing-declarations
-  GEN_CFLAGS = -ggdb -pg
-endif
-ifeq (RELEASE,0)
-  CFLAGS = -ggdb -pg -ansi -pedantic -Wall -Wextra -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wdeclaration-after-statement -Wmissing-declarations
+CFLAGS = -ansi -pedantic -Wall -Wextra -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wdeclaration-after-statement -Wmissing-declarations
+GEN_CFLAGS = 
+
+ifeq (@(RELEASE),0)
+  CFLAGS += -ggdb -pg 
+  GEN_CFLAGS += -ggdb -pg 
 else
-  CFLAGS = -O3 -ansi -pedantic -Wall -Wextra -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wdeclaration-after-statement -Wmissing-declarations
+  CFLAGS += -O3 
+  GEN_CFLAGS += -O3
 endif
+
 INCLUDES = -I src -I .
 LINKFLAGS = -L. -lkv
 OUTPUT = kvtest
