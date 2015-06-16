@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/fourier/libkv.svg?branch=master)](https://travis-ci.org/fourier/libkv)
+
 ## Simple library for parsing MATLAB/Octave-like matrix input
 ### Introduction
 The purpose of this library is to provide simple parser for text files with the data specified in key-value format (hence the name *libkv*). The types of values could be ASCII-strings, integers, floating point numbers. It also supports MATLAB/Octave-like syntax for vectors and matricies of integers and doubles, therefore making it convinient to test own numeric-oriented libraries against MATLAB/Octave prototypes.
